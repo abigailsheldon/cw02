@@ -13,13 +13,30 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final List<Recipe> recipes = [
     Recipe(
-      name: 'Spaghetti', 
-      ingredients: 'Pasta, Parmesan', 
-      instructions: "1. Boil pasta\n2. Add cheese"),
+      name: 'Spaghetti',
+      ingredients: 'Pasta, Parmesan, Tomato Sauce',
+      instructions: "1. Boil pasta.\n2. Add cheese and sauce.",
+    ),
     Recipe(
-      name: 'Avocado Toast', 
-      ingredients: 'Bread, Avocado, Lemon, Salt', 
-      instructions: '1. Toast bread\n2. Mash avocado\n3. Season and spread.'),
+      name: 'Black Sesame Cookies',
+      ingredients: 'Sugar, Butter, Flour, Almond Meal, Salt, Sesame Seeds, Egg Yolk',
+      instructions: "1. Combine flour, almond meal, sugar, and salt.\n2. Add sesame seeds.\n3. Add butter and sugar.\n4. Chill the dough.\n5. Bake at 350 degrees for 10 minutes.",
+    ),
+    Recipe(
+      name: 'Chicken Cacciatore',
+      ingredients: 'Chicken Thigh, Olive Oil, Celery, Mushroom, Onion, Garlic, Tomato Paste, Chicken Bouillon, Pepper Flakes, Stewed Tomatoes',
+      instructions: "1. Sauté chicken.\n2. Add remaining ingredients.\n3. Simmer.\n4. Serve with pasta or rice.",
+    ),
+    Recipe(
+      name: 'Avocado Toast',
+      ingredients: 'Bread, Avocado, Lemon, Salt, Garlic',
+      instructions: '1. Toast bread.\n2. Mash avocado and add remaining ingredients.\n3. Season and spread avocado mixture.',
+    ),
+    Recipe(
+      name: 'Egg Sandwich',
+      ingredients: 'Egg, White Bread, Mayo, Milk, Sugar, Salt, Pepper',
+      instructions: "1. Boil eggs.\n2. Peel and mash eggs.\n3. Add remaining ingredients.\n4. Spread egg mix on bread.",
+    ),
   ];
 
   final List<Recipe> favoriteRecipes = [];
@@ -30,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (recipe.isFavorite) {
         favoriteRecipes.add(recipe);
       } else {
-        favoriteRecipes.remove(recipe);
+        favoriteRecipes.removeWhere((fav) => fav.name == recipe.name);
       }
     });
   }
@@ -43,25 +60,33 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: ListView.builder(
         itemCount: recipes.length,
-        itemBuilder: (context, index){
+        itemBuilder: (context, index) {
+          final recipe = recipes[index];
           return ListTile(
-            title: Text(recipes[index].name),
-            trailing: Icon(
-              recipes[index].isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: recipes[index].isFavorite ? Colors.red : null,
-              ),
+            title: GestureDetector(
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => DetailsScreen(
-                      recipe: recipes[index],
-                      toggleFavorite: toggleFavorite,
-                    ),  
+                      recipe: recipe,
+                      toggleFavorite: toggleFavorite, 
+                    ),
                   ),
-                );
+                ).then((_) => setState(() {})); 
               },
-            );
+              child: Text(recipe.name),
+            ),
+            trailing: IconButton(
+              icon: Icon(
+                recipe.isFavorite ? Icons.favorite : Icons.favorite_border,
+                color: recipe.isFavorite ? Colors.red : null,
+              ),
+              onPressed: () {
+                toggleFavorite(recipe);
+              },
+            ),
+          );
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -69,12 +94,15 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => FavoritesScreen(favoriteRecipes: favoriteRecipes))
-          );
+            MaterialPageRoute(
+              builder: (context) => FavoritesScreen(
+                favoriteRecipes: favoriteRecipes,
+                toggleFavorite: toggleFavorite,
+              ),
+            ),
+          ).then((_) => setState(() {}));
         },
       ),
     );
   }
 }
-
-
